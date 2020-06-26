@@ -14,6 +14,7 @@ class RESTService {
   static const int PATCH = 7;
   static const int PATCH_URI = 8;
   static const int PATCH_FORM_DATA = 9;
+  static const int POST_QUERY = 10;
   static const String data = "data";
   static const String API_URL = "APIURL";
   static const String EXTRA_FORCE_REFRESH = "EXTRA_FORCE_REFRESH";
@@ -50,16 +51,20 @@ class RESTService {
         ..add(DioCacheManager(CacheConfig(baseUrl: apiUrl)).interceptor)
         ..add(InterceptorsWrapper(onRequest: (Options options) async {
           //Set the token to headers
+
+          print("FORCE_REFRESH------------------ $forceRefresh");
+
+          options.headers["apiCallIdentifier"] = apiCallIdentifier;
+          if (getHeaders() != null) {
+            options.headers.addAll(getHeaders());
+          }
+          options.extra.update("apiCallIdentifier", (value) => value,
+              ifAbsent: () => apiCallIdentifier);
+
           if (!forceRefresh) {
-            options.headers["apiCallIdentifier"] = apiCallIdentifier;
-            if (getHeaders() != null) {
-              options.headers.addAll(getHeaders());
-            }
             options.extra.addAll(buildCacheOptions(Duration(hours: 1),
                     forceRefresh: forceRefresh)
                 .extra);
-            options.extra.update("apiCallIdentifier", (value) => value,
-                ifAbsent: () => apiCallIdentifier);
             options.extra
                 .update("cached", (value) => value, ifAbsent: () => true);
           }
@@ -131,12 +136,6 @@ class RESTService {
           return parseResponse(response, apiCallIdentifier);
           break;
 
-        case RESTService.PATCH_FORM_DATA:
-          FormData formData = FormData.fromMap(parameters);
-          Future<Response> response = request.patch(action, data: formData);
-          return parseResponse(response, apiCallIdentifier);
-          break;
-
         case RESTService.PATCH_URI:
           Uri uri = Uri.parse(action);
           Future<Response> response = request.patchUri(Uri(
@@ -148,6 +147,17 @@ class RESTService {
 
           return parseResponse(response, apiCallIdentifier);
           break;
+
+        case RESTService.PATCH_FORM_DATA:
+          FormData formData = FormData.fromMap(parameters);
+          Future<Response> response = request.patch(action, data: formData);
+          return parseResponse(response, apiCallIdentifier);
+          break;
+
+        case RESTService.POST_QUERY:
+          Future<Response> response = request.post(action,
+              queryParameters: attachUriWithQuery(parameters));
+          return parseResponse(response, apiCallIdentifier);
 
         default:
           throw DioError(
