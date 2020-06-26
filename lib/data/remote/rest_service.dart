@@ -52,8 +52,6 @@ class RESTService {
         ..add(InterceptorsWrapper(onRequest: (Options options) async {
           //Set the token to headers
 
-          print("FORCE_REFRESH------------------ $forceRefresh");
-
           options.headers["apiCallIdentifier"] = apiCallIdentifier;
           if (getHeaders() != null) {
             options.headers.addAll(getHeaders());
