@@ -15,6 +15,7 @@ class RESTService {
   static const int PATCH_URI = 8;
   static const int PATCH_FORM_DATA = 9;
   static const int POST_QUERY = 10;
+  static const int DELETE_URI = 10;
   static const String data = "data";
   static const String API_URL = "APIURL";
   static const String EXTRA_FORCE_REFRESH = "EXTRA_FORCE_REFRESH";
@@ -137,6 +138,18 @@ class RESTService {
         case RESTService.PATCH_URI:
           Uri uri = Uri.parse(action);
           Future<Response> response = request.patchUri(Uri(
+              scheme: uri.scheme,
+              port: uri.port,
+              host: uri.host,
+              path: uri.path,
+              queryParameters: attachUriWithQuery(parameters)));
+
+          return parseResponse(response, apiCallIdentifier);
+          break;
+
+        case RESTService.DELETE_URI:
+          Uri uri = Uri.parse(action);
+          Future<Response> response = request.deleteUri(Uri(
               scheme: uri.scheme,
               port: uri.port,
               host: uri.host,
