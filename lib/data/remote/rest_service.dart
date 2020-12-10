@@ -15,7 +15,7 @@ class RESTService {
   static const int PATCH_URI = 8;
   static const int PATCH_FORM_DATA = 9;
   static const int POST_QUERY = 10;
-  static const int DELETE_URI = 10;
+  static const int DELETE_URI = 11;
   static const String data = "data";
   static const String API_URL = "APIURL";
   static const String EXTRA_FORCE_REFRESH = "EXTRA_FORCE_REFRESH";
